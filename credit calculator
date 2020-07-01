@@ -1,0 +1,82 @@
+import math, argparse, sys
+def end_word(digit):
+    if digit != 1:
+        return 's'
+    if digit == 1:
+        return ''
+def count_of_months(P, A, interest):
+    i = interest / (12 * 100)
+    months = math.ceil(math.log(A / (A - i * P), 1 + i))
+    Overpayment = months * A - P
+    years = 0
+    if months//12 > 0:
+        years = months // 12
+        months = math.ceil(months % 12)
+    if months != 0:
+        print(f'You need {years} year{end_word(years)} and {months} month{end_word(months)} to repay this credit!')
+    else:
+        print(f'You need {years} year{end_word(years)} to repay this credit!')
+    print(f'Overpayment = {Overpayment}')
+    
+def credit_principal(A, n, interest):
+    i = interest / (12 * 100)
+    P = math.floor(A / ((i * (1 + i) ** n) / (((1 + i) ** n) - 1)))
+    print(f'Your credit principal = {P}!')
+    Overpayment = math.ceil(A * n - P)
+    print(f'Overpayment = {Overpayment}')
+
+def annuity_monthly_paymanth(P, n, interest):
+    i = interest / (12 * 100)
+    A = math.ceil(P * (i * (1 + i) ** n) / ((1 + i) ** n - 1))
+    print(f'Your annuity payment = {A}!')
+    Overpayment = A * n - P
+    print(f'Overpayment = {Overpayment}')
+
+
+def credit_def(P, n, interest):
+    summ = 0
+    i = interest / (12 * 100)
+    m = 1
+    for m in range(1, n+1):
+        D1 = math.ceil(P/n + i * (P - (P * (m - 1) / n)))
+        summ += D1
+        print(f'Month {m}: paid out {D1}')
+    Overpayment = summ - P
+    print()
+    print(f'Overpayment = {Overpayment}')
+
+# menu(input())
+#начало измененной программы
+parser = argparse.ArgumentParser()
+parser.add_argument('--type')
+parser.add_argument('--principal', type=int)
+parser.add_argument('--periods', type=int)
+parser.add_argument('--interest', type=float)
+parser.add_argument('--payment', type=float)
+args = parser.parse_args()
+
+def calk():
+    if args.type == 'diff':
+        if args.payment is not None:
+            print('Incorrect parameters')
+        else:
+            credit_def(args.principal, args.periods, args.interest)
+    elif args.type == 'annuity':
+        if args.principal is None:
+            credit_principal(args.payment, args.periods, args.interest)
+        elif args.payment is None:
+            annuity_monthly_paymanth(args.principal, args.periods, args.interest)
+        else:
+            count_of_months(args.principal, args.payment, args.interest)
+    else:
+        print('Incorrect parameters')
+
+if args.interest is None or len(sys.argv) !=5 or args.interest<0 \
+        or args.principal is not None and args.principal < 0\
+        or args.periods is not None and args.periods <0\
+        or args.interest is not None and args.interest <0\
+        or args.payment is not None and args.payment <0:
+    print('Incorrect parameters')
+else:
+    calk()
+# print(sys.argv)
